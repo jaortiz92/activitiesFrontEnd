@@ -15,26 +15,26 @@
           <th>Detail</th>
         </tr>
       </thead>
-      <tbody
-        v-for="transaction in transactions"
-        :key="transaction.transaction_id"
-      >
-        <td class="item-number-value">{{ transaction.transaction_id }}</td>
-        <td class="item-special-size">{{ transaction.transaction_date }}</td>
-        <td>{{ transaction.category }}</td>
-        <td>{{ transaction.description }}</td>
-        <td>{{ transaction.kind }}</td>
-        <td>{{ transaction.origin }}</td>
-        <td>{{ transaction.destiny }}</td>
-        <td class="item-special-size">
-          {{ showAccountOfActivity(transaction.activities[0]) }}|{{
-            showAccountOfActivity(transaction.activities[1])
-          }}
-        </td>
-        <td class="item-number-value">
-          {{ formatterNumber(transaction.value) }}
-        </td>
-        <td class="item-detail-value">{{ transaction.detail }}</td>
+      <tbody>
+        <tr v-for="transaction in transactions"
+        :key="transaction.transaction_id">
+          <td class="item-number-value">{{ transaction.transaction_id }}</td>
+          <td class="item-special-size">{{ transaction.transaction_date }}</td>
+          <td>{{ transaction.category }}</td>
+          <td>{{ transaction.description }}</td>
+          <td>{{ transaction.kind }}</td>
+          <td>{{ transaction.origin }}</td>
+          <td>{{ transaction.destiny }}</td>
+          <td class="item-special-size">
+            {{ showAccountOfActivity(transaction.activities[0]) }}|{{
+              showAccountOfActivity(transaction.activities[1])
+            }}
+          </td>
+          <td class="item-number-value">
+            {{ formatterNumber(transaction.value) }}
+          </td>
+          <td class="item-detail-value">{{ transaction.detail }}</td>
+        </tr>
       </tbody>
     </table>
   </div>
@@ -113,10 +113,11 @@ td {
   padding: 2px 4px 2px 4px;
   font-size: 90%;
 }
-tbody:nth-child(even) {
+
+tbody tr:nth-child(even) {
   background-color: var(--normal-color);
 }
-tbody:nth-child(odd) {
+tbody tr:nth-child(odd) {
   background-color: var(--light-color);
 }
 .item-detail-value {
