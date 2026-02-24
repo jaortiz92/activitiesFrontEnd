@@ -156,10 +156,25 @@ export const recurringTransactions = [
         namePag: "Expenditure",
         category_id: 16,
         description_id: 90,
-        origin_id: 4,
+        origin_id: 8,
         activity_one: {
         nature: 0,
-        account_id: 26,
+        account_id: 11,
+        },
+        activity_two: {
+        nature: 1,
+        account_id: 53,
+        }
+    },
+    {
+        name: "Pago de deuda Seguro",
+        namePag: "Expenditure",
+        category_id: 16,
+        description_id: 3,
+        origin_id: 8,
+        activity_one: {
+        nature: 0,
+        account_id: 11,
         },
         activity_two: {
         nature: 1,

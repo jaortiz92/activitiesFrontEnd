@@ -1,17 +1,11 @@
 FROM node:20.18.0-alpine
 
-RUN npm install -g http-server
-
 WORKDIR /usr/src/app
 
 COPY package*.json ./
 
 RUN npm install
 
-COPY . .
+EXPOSE 5173
 
-RUN npm run build
-
-EXPOSE 8080
-
-CMD [ "http-server", "dist" ]
+CMD [ "npm", "run", "dev", "--", "--host", "0.0.0.0" ]

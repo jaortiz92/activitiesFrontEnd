@@ -1,0 +1,7 @@
+- Join request with axios -> OK
+- Update UI -> OK
+- Config main table to use more rows -> OK
+- Create a file with a general formatter
+- Create filtters to transactions
+- Create form to updates
+- Can use the app in the local red
