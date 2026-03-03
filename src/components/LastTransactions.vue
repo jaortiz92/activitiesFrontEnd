@@ -16,15 +16,17 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="transaction in transactions"
-        :key="transaction.transaction_id">
+        <tr
+          v-for="transaction in transactions"
+          :key="transaction.transaction_id"
+        >
           <td class="item-number-value">{{ transaction.transaction_id }}</td>
           <td class="item-special-size">{{ transaction.transaction_date }}</td>
-          <td>{{ transaction.category }}</td>
-          <td>{{ transaction.description }}</td>
-          <td>{{ transaction.kind }}</td>
-          <td>{{ transaction.origin }}</td>
-          <td>{{ transaction.destiny }}</td>
+          <td>{{ transaction.category.category }}</td>
+          <td>{{ transaction.description.description }}</td>
+          <td>{{ transaction.kind.kind }}</td>
+          <td>{{ transaction.origin.origin }}</td>
+          <td>{{ transaction.destiny.origin }}</td>
           <td class="item-special-size">
             {{ showAccountOfActivity(transaction.activities[0]) }}|{{
               showAccountOfActivity(transaction.activities[1])
@@ -48,7 +50,7 @@ import { formatters } from "@/plugins/formatters.js";
 export default {
   name: "LastTransactions",
   props: {
-    toShow: Number,
+    params: String,
   },
   data: function () {
     return {
@@ -56,12 +58,12 @@ export default {
     };
   },
   mounted() {
-    this.getLastTransactions(this.toShow);
+    this.getLastTransactions(this.params);
   },
   methods: {
-    async getLastTransactions(toShow) {
+    async getLastTransactions(params) {
       try {
-        const response = await transactionService.getLastTransactions(toShow);
+        const response = await transactionService.getLastTransactions(params);
         this.transactions = response.data;
       } catch (error) {
         Swal.fire({
@@ -76,7 +78,15 @@ export default {
       return formatters.formatterGeneralNumber(value);
     },
     showAccountOfActivity(value) {
-      return `${value.nature}-${value.account_id}`;
+      if (value !== undefined) {
+        let stringValue = "DB";
+        if (value.nature === "0") {
+          stringValue = "CR";
+        }
+        return `${stringValue}-${value.account_id}`;
+      } else {
+        return `Error`;
+      }
     },
   },
 };

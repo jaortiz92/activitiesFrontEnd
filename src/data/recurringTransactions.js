@@ -261,17 +261,17 @@ export const recurringTransactions = [
         name: "Deuda",
         namePag: "Transfer",
         category_id: 4,
-        description_id: 109,
+        description_id: 50,
         kind_id: 2,
-        origin_id: 4,
-        destiny_id: 25,
+        origin_id: 6,
+        destiny_id: 29,
         activity_one: {
         nature: 1,
         account_id: 23,
         },
         activity_two: {
         nature: 0,
-        account_id: 26,
+        account_id: 11,
         }
     },
     //Savings

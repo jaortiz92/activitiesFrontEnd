@@ -1,75 +1,66 @@
+<script setup>
+import { ref } from "vue";
+import LastTransactions from "@/components/LastTransactions.vue";
+import StatusAccounts from "@/components/StatusAccounts.vue";
+import FilterTransactions from "../components/FilterTransactions.vue";
+
+const keyLastTransactions = ref(0);
+const keyStatusAccounts = ref(0);
+const toShowForm = ref(null);
+const paramsToSearch = ref("limit=20");
+const currentFilters = ref({});
+
+const refreshLastTransactions = () => {};
+
+const handleFilterUpdate = (newFilters) => {
+  currentFilters.value = newFilters;
+  fetchTransactions();
+};
+
+const fetchTransactions = async () => {
+  const temp_params = new URLSearchParams();
+
+  for (const key in currentFilters.value) {
+    const value = currentFilters.value[key];
+    if (value !== null && value !== "") {
+      temp_params.append(key, value);
+    }
+  }
+
+  paramsToSearch.value = `${temp_params.toString()}`;
+  keyLastTransactions.value += 1;
+};
+</script>
+
 <template>
   <div class="home">
     <div class="header-home">
-      <StatusAccounts :key="keyStatusAccounts"></StatusAccounts>
+      <StatusAccounts :key="keyStatusAccounts" />
     </div>
-    <div class="rows-to-show">
-      <form v-on:submit.prevent="refreshLastTransactions()">
-        <label class="rows-to-show-label">Rows to show</label>
-        <div>
-          <input
-            class="rows-to-show-input"
-            v-model="toShowForm"
-            type="number"
-            min="1"
-            required="true"
-          />
-          <button class="rows-to-show-button" type="submit">Show</button>
-        </div>
-      </form>
-    </div>
+
+    <FilterTransactions
+      @apply-filters="handleFilterUpdate"
+    ></FilterTransactions>
+
     <LastTransactions
       class="transaction-home"
-      :toShow="toShow"
+      :params="paramsToSearch"
       :key="keyLastTransactions"
-    ></LastTransactions>
+    />
   </div>
 </template>
-<script>
-import LastTransactions from "@/components/LastTransactions.vue";
-import StatusAccounts from "@/components/StatusAccounts.vue";
 
-export default {
-  name: "Home",
-  components: {
-    LastTransactions,
-    StatusAccounts,
-  },
-  data: function () {
-    return {
-      keyLastTransactions: 0,
-      keyStatusAccounts: 0,
-      toShow: 100,
-      toShowForm: null,
-    };
-  },
-  methods: {
-    refreshLastTransactions: function () {
-      this.toShow = this.toShowForm;
-      this.keyLastTransactions += 1;
-    },
-  },
-};
-</script>
 <style scoped>
 .transaction-home {
   justify-content: center;
   align-items: center;
 }
-
 .header-home {
   display: flex;
   justify-content: center;
   margin-bottom: 2%;
   margin-top: 2%;
 }
-
-form {
-  width: 80%;
-  background: var(--background);
-  padding: 7%;
-}
-
 .rows-to-show {
   margin: auto;
   margin-bottom: 5%;
@@ -81,21 +72,18 @@ form {
   flex-direction: column;
   align-items: center;
 }
-
 .rows-to-show-label {
   width: 100%;
   font-size: 100%;
   font-weight: bold;
   margin-bottom: 5%;
 }
-
 .rows-to-show div {
   display: flex;
   justify-content: space-between;
   width: 100%;
   max-width: 600px;
 }
-
 .rows-to-show-input,
 .rows-to-show-button {
   flex: 1;

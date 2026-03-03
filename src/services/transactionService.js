@@ -1,9 +1,9 @@
 import axiosInstance from "@/plugins/axios";
 
 export const transactionService = {
-  getLastTransactions: function (toShow) {
+  getLastTransactions: function (params) {
     return axiosInstance.get(
-      `/transaction/transactionShowFront?limit=${toShow}`
+      `/transaction/?${params}`
     );
   },
   postTransaction: function (transaction) {
@@ -24,6 +24,15 @@ export const transactionService = {
   },
   getKinds: function (group) {
     return axiosInstance.get(`/kind/group/${group}`);
+  },
+  getAllCategories: function () {
+    return axiosInstance.get(`/category/`);
+  },
+  getAllDescriptions: function () {
+    return axiosInstance.get(`/description/`);
+  },
+  getAllKinds: function () {
+    return axiosInstance.get(`/kind/`);
   },
   getOrigins: function () {
     return axiosInstance.get(`/origin/`);
