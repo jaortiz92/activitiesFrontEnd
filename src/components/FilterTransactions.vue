@@ -17,6 +17,7 @@
         <div class="filter-item">
           <label>Category</label>
           <select v-model="filters.category_id">
+            <option :value="null"></option>
             <option
               v-for="option in categories"
               :key="option.category_id"
@@ -29,6 +30,7 @@
         <div class="filter-item">
           <label>Description</label>
           <select v-model="filters.description_id">
+            <option :value="null"></option>
             <option
               v-for="option in descriptions"
               :key="option.description_id"
@@ -41,6 +43,7 @@
         <div class="filter-item">
           <label>Kind</label>
           <select v-model="filters.kind_id">
+            <option :value="null"></option>
             <option
               v-for="option in kinds"
               :key="option.kind_id"
@@ -53,6 +56,7 @@
         <div class="filter-item">
           <label>Origin</label>
           <select v-model="filters.origin_id">
+            <option :value="null"></option>
             <option
               v-for="option in origins"
               :key="option.origin_id"
@@ -65,6 +69,7 @@
         <div class="filter-item">
           <label>Destiny</label>
           <select v-model="filters.destiny_id">
+            <option :value="null"></option>
             <option
               v-for="option in origins"
               :key="option.origin_id"
