@@ -141,7 +141,7 @@ export const recurringTransactions = [
         namePag: "Expenditure",
         category_id: 20,
         description_id: 67,
-        origin_id: 5,
+        origin_id: 28,
         activity_one: {
         nature: 0,
         account_id: 26,
