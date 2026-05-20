@@ -1,105 +1,184 @@
 <template>
-  <div class="delete-form">
-    <form v-on:submit.prevent="deleteTransaction">
-      <label class="delete-items-label">Delete Transaction by ID</label>
-      <div>
-        <input
-          class="delete-items-input"
-          v-model="transaction_id"
-          type="number"
-          min="1"
-          required="true"
-        />
-        <button class="delete-items-button" type="submit">Delete</button>
+  <div class="delete-transaction-card">
+    <div class="card-header">
+      <h3 class="card-title">Delete Transaction</h3>
+      <p class="card-subtitle">
+        Enter the unique ID of the transaction you wish to remove.
+      </p>
+    </div>
+
+    <form class="delete-form" @submit.prevent="handleDelete">
+      <div class="input-action-group">
+        <div class="form-group">
+          <label class="form-label">Transaction ID</label>
+          <input
+            class="form-input"
+            v-model="transaction_id"
+            type="number"
+            min="1"
+            placeholder="e.g. 1234"
+            required
+          />
+        </div>
+        <button class="btn-delete" type="submit" :disabled="!transaction_id">
+          <span class="btn-text">Delete Permanently</span>
+        </button>
       </div>
     </form>
   </div>
 </template>
-<script>
+
+<script setup>
+import { ref, defineEmits } from "vue";
 import Swal from "sweetalert2";
 import { transactionService } from "../services/transactionService";
 
-export default {
-  name: "DeleteTransaction",
-  emits: ["updatePag"],
-  data: function () {
-    return {
-      transaction_id: null,
-    };
-  },
-  methods: {
-    async deleteTransaction() {
-      const ressult = await Swal.fire({
-        title: "Are you sure?",
-        text: `You want delete transaction ${this.transaction_id}!`,
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, delete it!",
+const emit = defineEmits(["updatePag"]);
+const transaction_id = ref(null);
+
+const handleDelete = async () => {
+  if (!transaction_id.value) return;
+
+  const result = await Swal.fire({
+    title: "Are you sure?",
+    text: `Transaction ID ${transaction_id.value} will be permanently removed. This action cannot be undone.`,
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#ef4444", // Red for destructive action
+    cancelButtonColor: "#64748b",
+    confirmButtonText: "Yes, delete it!",
+    cancelButtonText: "Cancel",
+  });
+
+  if (result.isConfirmed) {
+    try {
+      await transactionService.deleteTransaction(transaction_id.value);
+
+      Swal.fire({
+        icon: "success",
+        title: "Deleted!",
+        text: `Transaction ${transaction_id.value} has been removed.`,
+        confirmButtonColor: "var(--dark-color-opposite-one)",
       });
 
-      if (ressult.isConfirmed) {
-        try {
-          const response = await transactionService.deleteTransaction(
-            this.transaction_id
-          );
-          Swal.fire({
-            icon: "success",
-            title: "Transaction deleted",
-            text: `Transaction's ID ${this.transaction_id}`,
-            confirmButtonColor: "#141e28",
-          });
-          this.$emit("updatePag");
-        } catch (error) {
-          Swal.fire({
-            icon: "error",
-            title: "Oops...",
-            text: `ERROR to delete transaction ${error}`,
-            confirmButtonColor: "#141e28",
-          });
-        }
-      }
-    },
-  },
+      transaction_id.value = null;
+      emit("updatePag");
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Deletion Failed",
+        text:
+          error.message ||
+          "An error occurred while trying to delete the transaction.",
+        confirmButtonColor: "var(--dark-color-opposite-one)",
+      });
+    }
+  }
 };
 </script>
+
 <style scoped>
+.delete-transaction-card {
+  background-color: white;
+  border-radius: 16px;
+  border: 1px solid var(--light-border);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  width: 100%;
+}
+
+.card-header {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid var(--light-border);
+  background-color: #fff1f2; /* Subtle red tint to indicate destructive area */
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #991b1b;
+  margin-bottom: 0.25rem;
+}
+
+.card-subtitle {
+  color: #7f1d1d;
+  font-size: 0.875rem;
+  opacity: 0.8;
+}
+
 .delete-form {
-  margin: auto;
-  margin-bottom: 5%;
-  margin-top: 5%;
-  width: 40%;
-  min-width: 250px;
-  border-radius: 5px;
+  padding: 2rem;
+}
+
+.input-action-group {
+  display: flex;
+  align-items: flex-end;
+  gap: 1.5rem;
+}
+
+.form-group {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  gap: 0.5rem;
 }
 
-form {
-  width: 100%;
-  background: var(--background);
-  padding: 7%;
+.form-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #475569;
 }
 
-.delete-items-label {
-  width: 100%;
-  font-size: 100%;
-  font-weight: bold;
-  margin-bottom: 5%;
+.form-input {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--light-border);
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  transition: all 0.2s ease;
+  width: 80%;
+  background-color: #fff;
 }
 
-.delete-form div {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  max-width: 600px;
+.form-input:focus {
+  outline: none;
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
 }
 
-.delete-items-input,
-.delete-items-button {
-  flex: 1;
-  margin: 0 10px;
+.btn-delete {
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  height: 46px; /* Match input height */
+  margin: 5px;
+}
+
+.btn-delete:hover:not(:disabled) {
+  background-color: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+.btn-delete:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .input-action-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn-delete {
+    width: 100%;
+  }
 }
 </style>

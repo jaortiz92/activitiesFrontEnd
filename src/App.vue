@@ -47,7 +47,7 @@ button {
 }
 
 form {
-  width: 70%;
+  width: 80%;
   min-width: 350px;
   margin: 0 auto;
   padding: 2%;
