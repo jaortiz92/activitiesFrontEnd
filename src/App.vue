@@ -32,16 +32,7 @@ import Navbar from "@/components/Navbar.vue";
   font-family: Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: var(--text);
-}
-
-nav {
-  background-color: var(--background);
-}
-
-#nav a.router-link-exact-active {
-  color: var(--basic-select);
+  color: var(--text-black);
 }
 
 button {

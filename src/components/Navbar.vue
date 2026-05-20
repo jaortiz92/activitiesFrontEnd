@@ -1,17 +1,24 @@
 <template>
-  <nav class="nav">
-    <div>
-      <ul>
-        <li>
-          <router-link class="item" to="/">Home</router-link>
-        </li>
-        <li>
-          <router-link class="item" to="/transaction">Transaction</router-link>
-        </li>
-        <li>
-          <router-link class="item" to="/edit">Edit</router-link>
-        </li>
-      </ul>
+  <nav class="main-navbar">
+    <div class="navbar-container">
+      <div class="navbar-brand">
+        <router-link to="/" class="brand-link">
+          <div class="brand-icon">A</div>
+          <span class="brand-text">Activity</span>
+        </router-link>
+      </div>
+
+      <div class="navbar-links">
+        <router-link class="nav-link" to="/">
+          <span class="link-text">Home</span>
+        </router-link>
+        <router-link class="nav-link" to="/transaction">
+          <span class="link-text">Transaction</span>
+        </router-link>
+        <router-link class="nav-link" to="/edit">
+          <span class="link-text">Edit</span>
+        </router-link>
+      </div>
     </div>
   </nav>
 </template>
@@ -19,36 +26,98 @@
 <script setup></script>
 
 <style scoped>
-nav {
-  padding: 10px;
-  box-shadow: 0 1px 6px var(--shadow);
-  margin-bottom: 10px;
-}
-
-ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+.main-navbar {
+  background-color: white;
+  border-bottom: 1px solid var(--light-border);
+  height: 72px;
   display: flex;
-  justify-content: left;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  transition: all 0.3s ease;
 }
 
-li {
-  margin: 0 20px;
+.navbar-container {
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-a {
+.navbar-brand .brand-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
   text-decoration: none;
-  color: var(--dark-color-opposite-one);
-  padding: 8px 10px;
-  border-radius: 5px;
-  transition: background-color 0.2s ease-in-out;
+  transition: opacity 0.2s ease;
 }
 
-a:hover {
-  background-color: var(--light-color-opposite-two);
+.navbar-brand .brand-link:hover {
+  opacity: 0.8;
 }
-a.router-link-active {
-  font-weight: bold;
+
+.brand-icon {
+  background-color: var(--dark-color-opposite-one);
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+
+.brand-text {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--dark-color-opposite-one);
+  letter-spacing: -0.025em;
+}
+
+.navbar-links {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: var(--dark-color);
+  font-weight: 600;
+  padding: 0.625rem 1.25rem;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+  font-size: 0.9375rem;
+}
+
+.nav-link:hover {
+  background-color: var(--light-color-opposite-two);
+  color: var(--dark-color-opposite-one);
+}
+
+.nav-link.router-link-active {
+  background-color: var(--light-color-opposite-two);
+  color: var(--dark-color-opposite-one);
+}
+
+@media (max-width: 768px) {
+  .brand-text {
+    display: none;
+  }
+
+  .navbar-container {
+    padding: 0 1rem;
+  }
+
+  .nav-link {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
 }
 </style>
