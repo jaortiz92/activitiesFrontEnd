@@ -1,3 +1,30 @@
+<template>
+  <div class="home-view">
+    <header class="dashboard-header">
+      <div class="content-container">
+        <h1 class="page-title">Financial Overview</h1>
+        <StatusAccounts :key="keyStatusAccounts" />
+      </div>
+    </header>
+
+    <main class="dashboard-content content-container">
+      <section class="filters-section">
+        <FilterTransactions @apply-filters="handleFilterUpdate" />
+      </section>
+
+      <section class="transactions-section">
+        <div class="section-header">
+          <h2>Recent Transactions</h2>
+        </div>
+        <LastTransactions
+          :params="paramsToSearch"
+          :key="keyLastTransactions"
+        />
+      </section>
+    </main>
+  </div>
+</template>
+
 <script setup>
 import { ref } from "vue";
 import LastTransactions from "@/components/LastTransactions.vue";
@@ -6,87 +33,80 @@ import FilterTransactions from "../components/FilterTransactions.vue";
 
 const keyLastTransactions = ref(0);
 const keyStatusAccounts = ref(0);
-const toShowForm = ref(null);
 const paramsToSearch = ref("limit=20");
-const currentFilters = ref({});
-
-const refreshLastTransactions = () => {};
 
 const handleFilterUpdate = (newFilters) => {
-  currentFilters.value = newFilters;
-  fetchTransactions();
-};
-
-const fetchTransactions = async () => {
   const temp_params = new URLSearchParams();
 
-  for (const key in currentFilters.value) {
-    const value = currentFilters.value[key];
-    if (value !== null && value !== "") {
+  for (const key in newFilters) {
+    const value = newFilters[key];
+    if (value !== null && value !== "" && value !== undefined) {
       temp_params.append(key, value);
     }
   }
 
-  paramsToSearch.value = `${temp_params.toString()}`;
+  paramsToSearch.value = temp_params.toString() || "limit=20";
   keyLastTransactions.value += 1;
 };
 </script>
 
-<template>
-  <div class="home">
-    <div class="header-home">
-      <StatusAccounts :key="keyStatusAccounts" />
-    </div>
-
-    <FilterTransactions
-      @apply-filters="handleFilterUpdate"
-    ></FilterTransactions>
-
-    <LastTransactions
-      class="transaction-home"
-      :params="paramsToSearch"
-      :key="keyLastTransactions"
-    />
-  </div>
-</template>
-
 <style scoped>
-.transaction-home {
-  justify-content: center;
-  align-items: center;
+.home-view {
+  min-height: 100vh;
+  background-color: #f8fafc;
 }
-.header-home {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 2%;
-  margin-top: 2%;
+
+.dashboard-header {
+  background-color: white;
+  padding: 2rem 0;
+  border-bottom: 1px solid var(--light-border);
+  margin-bottom: 2rem;
 }
-.rows-to-show {
-  margin: auto;
-  margin-bottom: 5%;
-  margin-top: 5%;
-  width: 40%;
-  min-width: 250px;
-  border-radius: 5px;
+
+.content-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.page-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--dark-color-opposite-one);
+  margin-bottom: 1.5rem;
+}
+
+.dashboard-content {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  gap: 2rem;
+  padding-bottom: 3rem;
 }
-.rows-to-show-label {
-  width: 100%;
-  font-size: 100%;
-  font-weight: bold;
-  margin-bottom: 5%;
-}
-.rows-to-show div {
+
+.section-header {
   display: flex;
   justify-content: space-between;
-  width: 100%;
-  max-width: 600px;
+  align-items: center;
+  margin-bottom: 1rem;
 }
-.rows-to-show-input,
-.rows-to-show-button {
-  flex: 1;
-  margin: 0 10px;
+
+.section-header h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--dark-color);
+}
+
+.filters-section {
+  width: 100%;
+}
+
+.transactions-section {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 1.5rem;
+  }
 }
 </style>
