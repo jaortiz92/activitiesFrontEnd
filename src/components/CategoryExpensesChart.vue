@@ -3,8 +3,18 @@
     <div class="chart-header">
       <div class="header-main">
         <h2 class="chart-title">Expenses Comparison by Category</h2>
+        <div class="header-totals">
+          <div class="header-total-item current">
+            <span class="total-label">Total Current</span>
+            <span class="total-amount">{{ formatCurrency(grandTotalCurrent) }}</span>
+          </div>
+          <div class="header-total-item previous">
+            <span class="total-label">Total Previous</span>
+            <span class="total-amount">{{ formatCurrency(grandTotalPrevious) }}</span>
+          </div>
+        </div>
       </div>
-
+      
       <div class="chart-controls">
         <div class="legend-item">
           <span class="color-box current"></span>
@@ -13,20 +23,6 @@
         <div class="legend-item">
           <span class="color-box previous"></span>
           <span class="period-label">Previous</span>
-        </div>
-        <div class="header-totals">
-          <div class="header-total-item current">
-            <span class="total-label">Total Current</span>
-            <span class="total-amount">{{
-              formatCurrency(grandTotalCurrent)
-            }}</span>
-          </div>
-          <div class="header-total-item previous">
-            <span class="total-label">Total Previous</span>
-            <span class="total-amount">{{
-              formatCurrency(grandTotalPrevious)
-            }}</span>
-          </div>
         </div>
       </div>
     </div>
@@ -42,51 +38,51 @@
 
     <div v-else class="scrollable-content">
       <div class="bars-wrapper">
-        <div
-          v-for="item in processedData"
-          :key="item.code"
-          class="category-row"
-        >
+        <div v-for="item in processedData" :key="item.code" class="category-row">
           <div class="category-info">
             <span class="category-code">{{ item.code }}</span>
             <span class="category-change" :class="getChangeClass(item.change)">
-              {{ item.change > 0 ? "↑" : item.change < 0 ? "↓" : "" }}
-              {{ Math.abs(item.change).toFixed(1) }}%
+              {{ item.change > 0 ? '↑' : item.change < 0 ? '↓' : '' }} {{ Math.abs(item.change).toFixed(1) }}%
             </span>
           </div>
-
+          
           <div class="bar-group">
             <!-- Current Month Bar -->
             <div class="bar-container">
-              <div
-                class="bar current"
+              <div 
+                class="bar current" 
                 :style="{ width: item.currentWidth + '%' }"
-                :title="`Current: ${formatCurrency(item.currentValue)}`"
+                :title="`Current: ${formatCurrency(item.currentValue)} (${item.currentShare.toFixed(1)}%)`"
               >
-                <span v-if="item.currentWidth > 3" class="bar-value">
+                <span v-if="item.currentWidth > 15" class="bar-value">
                   {{ formatCurrency(item.currentValue) }}
                 </span>
               </div>
             </div>
-
+            
             <!-- Previous Month Bar -->
             <div class="bar-container">
-              <div
-                class="bar previous"
+              <div 
+                class="bar previous" 
                 :style="{ width: item.previousWidth + '%' }"
-                :title="`Previous: ${formatCurrency(item.previousValue)}`"
+                :title="`Previous: ${formatCurrency(item.previousValue)} (${item.previousShare.toFixed(1)}%)`"
               >
-                <span v-if="item.previousWidth > 3" class="bar-value">
+                <span v-if="item.previousWidth > 15" class="bar-value">
                   {{ formatCurrency(item.previousValue) }}
                 </span>
               </div>
             </div>
           </div>
-          <div class="category-totals">
-            <span class="total-label">Current:</span>
-            <span class="total-amount">{{
-              formatCurrency(item.currentValue)
-            }}</span>
+
+          <div class="category-shares">
+            <div class="share-item current">
+              <span class="share-label">Share Cur.</span>
+              <span class="share-value">{{ item.currentShare.toFixed(1) }}%</span>
+            </div>
+            <div class="share-item previous">
+              <span class="share-label">Share Prev.</span>
+              <span class="share-value">{{ item.previousShare.toFixed(1) }}%</span>
+            </div>
           </div>
         </div>
       </div>
@@ -95,9 +91,9 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
-import { useDashboardStore } from "@/stores/dashboardStore";
-import { formatters } from "@/plugins/formatters";
+import { computed } from 'vue';
+import { useDashboardStore } from '@/stores/dashboardStore';
+import { formatters } from '@/plugins/formatters';
 
 const store = useDashboardStore();
 const loading = computed(() => store.loading);
@@ -105,59 +101,60 @@ const error = computed(() => store.error);
 
 const formatCurrency = (value) => formatters.formatterGeneralNumber(value);
 
-const grandTotalCurrent = computed(() =>
-  store.currentMonthGroups.reduce((acc, g) => acc + g.value, 0),
+const grandTotalCurrent = computed(() => 
+  store.currentMonthGroups.reduce((acc, g) => acc + g.value, 0)
 );
 
-const grandTotalPrevious = computed(() =>
-  store.previousMonthGroups.reduce((acc, g) => acc + g.value, 0),
+const grandTotalPrevious = computed(() => 
+  store.previousMonthGroups.reduce((acc, g) => acc + g.value, 0)
 );
 
 const processedData = computed(() => {
   const currentGroups = store.currentMonthGroups;
   const previousGroups = store.previousMonthGroups;
-
-  const allCodes = Array.from(
-    new Set([
-      ...currentGroups.map((g) => g.code),
-      ...previousGroups.map((g) => g.code),
-    ]),
-  ).sort();
+  
+  const totalC = grandTotalCurrent.value || 1;
+  const totalP = grandTotalPrevious.value || 1;
+  
+  const allCodes = Array.from(new Set([
+    ...currentGroups.map(g => g.code),
+    ...previousGroups.map(g => g.code)
+  ])).sort();
 
   const maxValue = Math.max(
-    ...currentGroups.map((g) => g.value),
-    ...previousGroups.map((g) => g.value),
-    1,
+    ...currentGroups.map(g => g.value),
+    ...previousGroups.map(g => g.value),
+    1
   );
 
-  return allCodes
-    .map((code) => {
-      const current = currentGroups.find((g) => g.code === code)?.value || 0;
-      const previous = previousGroups.find((g) => g.code === code)?.value || 0;
+  return allCodes.map(code => {
+    const current = currentGroups.find(g => g.code === code)?.value || 0;
+    const previous = previousGroups.find(g => g.code === code)?.value || 0;
+    
+    let change = 0;
+    if (previous > 0) {
+      change = ((current - previous) / previous) * 100;
+    } else if (current > 0) {
+      change = 100;
+    }
 
-      let change = 0;
-      if (previous > 0) {
-        change = ((current - previous) / previous) * 100;
-      } else if (current > 0) {
-        change = 100;
-      }
-
-      return {
-        code,
-        currentValue: current,
-        previousValue: previous,
-        currentWidth: (current / maxValue) * 100,
-        previousWidth: (previous / maxValue) * 100,
-        change,
-      };
-    })
-    .sort((a, b) => b.currentValue - a.currentValue);
+    return {
+      code,
+      currentValue: current,
+      previousValue: previous,
+      currentWidth: (current / maxValue) * 100,
+      previousWidth: (previous / maxValue) * 100,
+      currentShare: (current / totalC) * 100,
+      previousShare: (previous / totalP) * 100,
+      change
+    };
+  }).sort((a, b) => b.currentValue - a.currentValue);
 });
 
 const getChangeClass = (change) => {
-  if (change > 0) return "text-danger";
-  if (change < 0) return "text-success";
-  return "text-neutral";
+  if (change > 0) return 'text-danger';
+  if (change < 0) return 'text-success';
+  return 'text-neutral';
 };
 </script>
 
@@ -169,7 +166,7 @@ const getChangeClass = (change) => {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
-  max-height: 600px; /* Limits overall height of the component */
+  max-height: 600px;
 }
 
 .chart-header {
@@ -179,7 +176,7 @@ const getChangeClass = (change) => {
   margin-bottom: 1.5rem;
   border-bottom: 1px solid #f1f5f9;
   padding-bottom: 1rem;
-  flex-shrink: 0; /* Header won't shrink */
+  flex-shrink: 0;
 }
 
 .header-main {
@@ -218,12 +215,8 @@ const getChangeClass = (change) => {
   font-weight: 800;
 }
 
-.header-total-item.current .total-amount {
-  color: #4f46e5;
-}
-.header-total-item.previous .total-amount {
-  color: #64748b;
-}
+.header-total-item.current .total-amount { color: #4f46e5; }
+.header-total-item.previous .total-amount { color: #64748b; }
 
 .chart-controls {
   display: flex;
@@ -243,12 +236,8 @@ const getChangeClass = (change) => {
   border-radius: 2px;
 }
 
-.color-box.current {
-  background-color: #4f46e5;
-}
-.color-box.previous {
-  background-color: #cbd5e1;
-}
+.color-box.current { background-color: #4f46e5; }
+.color-box.previous { background-color: #cbd5e1; }
 
 .period-label {
   font-size: 0.7rem;
@@ -256,11 +245,9 @@ const getChangeClass = (change) => {
   color: #64748b;
 }
 
-/* Scrollable Area */
 .scrollable-content {
   overflow-y: auto;
   padding-right: 0.5rem;
-  /* Styling scrollbar for better aesthetics */
 }
 
 .scrollable-content::-webkit-scrollbar {
@@ -277,10 +264,6 @@ const getChangeClass = (change) => {
   border-radius: 10px;
 }
 
-.scrollable-content::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
 .bars-wrapper {
   display: flex;
   flex-direction: column;
@@ -290,7 +273,7 @@ const getChangeClass = (change) => {
 
 .category-row {
   display: grid;
-  grid-template-columns: 90px 1fr 130px;
+  grid-template-columns: 90px 1fr 150px;
   align-items: center;
   gap: 1rem;
 }
@@ -353,36 +336,39 @@ const getChangeClass = (change) => {
   color: #475569;
 }
 
-.category-totals {
+.category-shares {
   display: flex;
-  flex-direction: column;
+  justify-content: flex-end;
+  gap: 1rem;
   text-align: right;
 }
 
-.total-label {
-  font-size: 0.65rem;
+.share-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.share-label {
+  font-size: 0.6rem;
   color: #94a3b8;
   text-transform: uppercase;
+  font-weight: 600;
 }
 
-.total-amount {
-  font-weight: 700;
-  color: #1e293b;
+.share-value {
+  font-weight: 800;
   font-size: 0.85rem;
+  color: #1e293b;
 }
 
-.text-danger {
-  color: #ef4444;
-}
-.text-success {
-  color: #10b981;
-}
-.text-neutral {
-  color: #94a3b8;
-}
+.share-item.current .share-value { color: #4f46e5; }
+.share-item.previous .share-value { color: #64748b; }
 
-.loading-state,
-.error-state {
+.text-danger { color: #ef4444; }
+.text-success { color: #10b981; }
+.text-neutral { color: #94a3b8; }
+
+.loading-state, .error-state {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -402,12 +388,8 @@ const getChangeClass = (change) => {
 }
 
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 @media (max-width: 768px) {
@@ -415,16 +397,8 @@ const getChangeClass = (change) => {
     grid-template-columns: 50px 1fr;
     gap: 0.75rem;
   }
-  .category-totals {
+  .category-shares {
     display: none;
-  }
-  .chart-header {
-    flex-direction: column;
-    gap: 1rem;
-  }
-  .header-totals {
-    flex-wrap: wrap;
-    gap: 1rem;
   }
 }
 </style>
