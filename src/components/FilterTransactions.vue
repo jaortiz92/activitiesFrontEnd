@@ -31,7 +31,7 @@
               :key="option.category_id"
               :value="option.category_id"
             >
-              {{ option.category }}
+              {{ option.category }} => {{ option.group.group }}
             </option>
           </select>
         </div>
@@ -44,7 +44,7 @@
               :key="option.description_id"
               :value="option.description_id"
             >
-              {{ option.description }}
+              {{ option.description }} => {{ option.group.group }}
             </option>
           </select>
         </div>
@@ -57,7 +57,7 @@
               :key="option.kind_id"
               :value="option.kind_id"
             >
-              {{ option.kind }}
+              {{ option.kind }} => {{ option.group.group }}
             </option>
           </select>
         </div>
@@ -262,7 +262,9 @@ const clearFilters = () => {
   border: 1px solid #e2e8f0 !important;
   border-radius: 6px !important;
   font-size: 0.875rem !important;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
   margin: 0 !important;
   box-sizing: border-box !important;
   height: 40px; /* Force consistent height */
@@ -319,12 +321,13 @@ const clearFilters = () => {
     grid-template-columns: 1fr;
     gap: 0.75rem;
   }
-  
+
   .filter-actions {
     flex-direction: column-reverse;
   }
-  
-  .btn-clear, .btn-apply {
+
+  .btn-clear,
+  .btn-apply {
     width: 100% !important;
   }
 }

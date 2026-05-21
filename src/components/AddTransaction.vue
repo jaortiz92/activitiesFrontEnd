@@ -4,7 +4,9 @@
       <div class="header-content">
         <div class="title-section">
           <h2 class="card-title">{{ namePag }}</h2>
-          <p class="card-subtitle">Enter movement details with double-entry validation.</p>
+          <p class="card-subtitle">
+            Enter movement details with double-entry validation.
+          </p>
         </div>
         <div class="quick-fill-section">
           <label class="form-label compact-label">Quick Fill Template</label>
@@ -56,7 +58,11 @@
         </div>
         <div class="form-group">
           <label class="form-label aligned-label">Transaction Category</label>
-          <select class="form-select" v-model="transaction.category_id" required>
+          <select
+            class="form-select"
+            v-model="transaction.category_id"
+            required
+          >
             <option :value="null" disabled>Select category...</option>
             <option
               v-for="category in categories"
@@ -69,7 +75,11 @@
         </div>
         <div class="form-group">
           <label class="form-label aligned-label">Description Type</label>
-          <select class="form-select" v-model="transaction.description_id" required>
+          <select
+            class="form-select"
+            v-model="transaction.description_id"
+            required
+          >
             <option :value="null" disabled>Select description...</option>
             <option
               v-for="description in descriptions"
@@ -94,7 +104,11 @@
               <span class="entry-badge">1st Account</span>
             </div>
             <div class="entry-row-inputs">
-              <select class="form-select flex-grow" v-model="transaction.activity_one.account_id" required>
+              <select
+                class="form-select flex-grow"
+                v-model="transaction.activity_one.account_id"
+                required
+              >
                 <option :value="null" disabled>Select account...</option>
                 <option
                   v-for="account in accounts"
@@ -104,10 +118,15 @@
                   {{ account.account_id }} - {{ account.account }}
                 </option>
               </select>
-              <select class="form-select nature-width" @change="validateNature(1)" v-model="transaction.activity_one.nature" required>
+              <select
+                class="form-select nature-width"
+                @change="validateNature(1)"
+                v-model="transaction.activity_one.nature"
+                required
+              >
                 <option :value="null" disabled>Nature</option>
-                <option :value="1">DB (Debit)</option>
-                <option :value="0">CR (Credit)</option>
+                <option :value="1">Debit</option>
+                <option :value="0">Credit</option>
               </select>
             </div>
           </div>
@@ -118,7 +137,11 @@
               <span class="entry-badge">2nd Account</span>
             </div>
             <div class="entry-row-inputs">
-              <select class="form-select flex-grow" v-model="transaction.activity_two.account_id" required>
+              <select
+                class="form-select flex-grow"
+                v-model="transaction.activity_two.account_id"
+                required
+              >
                 <option :value="null" disabled>Select account...</option>
                 <option
                   v-for="account in accounts"
@@ -128,10 +151,15 @@
                   {{ account.account_id }} - {{ account.account }}
                 </option>
               </select>
-              <select class="form-select nature-width" @change="validateNature(2)" v-model="transaction.activity_two.nature" required>
+              <select
+                class="form-select nature-width"
+                @change="validateNature(2)"
+                v-model="transaction.activity_two.nature"
+                required
+              >
                 <option :value="null" disabled>Nature</option>
-                <option :value="1">DB (Debit)</option>
-                <option :value="0">CR (Credit)</option>
+                <option :value="1">Debit</option>
+                <option :value="0">Credit</option>
               </select>
             </div>
           </div>
@@ -144,7 +172,11 @@
           <label class="form-label">Kind</label>
           <select class="form-select" v-model="transaction.kind_id" required>
             <option :value="null" disabled>Select kind...</option>
-            <option v-for="kind in kinds" :key="kind.kind_id" :value="kind.kind_id">
+            <option
+              v-for="kind in kinds"
+              :key="kind.kind_id"
+              :value="kind.kind_id"
+            >
               {{ kind.kind }}
             </option>
           </select>
@@ -153,7 +185,11 @@
           <label class="form-label">Origin</label>
           <select class="form-select" v-model="transaction.origin_id" required>
             <option :value="null" disabled>Select origin...</option>
-            <option v-for="origin in origins" :key="origin.origin_id" :value="origin.origin_id">
+            <option
+              v-for="origin in origins"
+              :key="origin.origin_id"
+              :value="origin.origin_id"
+            >
               {{ origin.origin }}
             </option>
           </select>
@@ -162,7 +198,11 @@
           <label class="form-label">Destiny</label>
           <select class="form-select" v-model="transaction.destiny_id" required>
             <option :value="null" disabled>Select destiny...</option>
-            <option v-for="origin in origins" :key="origin.origin_id" :value="origin.origin_id">
+            <option
+              v-for="origin in origins"
+              :key="origin.origin_id"
+              :value="origin.origin_id"
+            >
               {{ origin.origin }}
             </option>
           </select>
@@ -210,7 +250,7 @@ const origins = ref([]);
 const selectedRecurringTransactions = ref(null);
 
 const transaction = ref({
-  transaction_date: new Date().toISOString().substr(0, 10),
+  transaction_date: null,
   value: null,
   detail: null,
   category_id: null,
@@ -238,7 +278,7 @@ const forShow = ref({
 
 const filteredRecurringTransactions = computed(() => {
   return recurringTransactions.filter(
-    (rTransaction) => rTransaction.namePag === props.namePag
+    (rTransaction) => rTransaction.namePag === props.namePag,
   );
 });
 
@@ -253,9 +293,11 @@ const errorAlert = (option, introduction = "Error loading") => {
 
 const validateNature = (entryNumber) => {
   if (entryNumber === 1) {
-    transaction.value.activity_two.nature = transaction.value.activity_one.nature === 1 ? 0 : 1;
+    transaction.value.activity_two.nature =
+      transaction.value.activity_one.nature === 1 ? 0 : 1;
   } else {
-    transaction.value.activity_one.nature = transaction.value.activity_two.nature === 1 ? 0 : 1;
+    transaction.value.activity_one.nature =
+      transaction.value.activity_two.nature === 1 ? 0 : 1;
   }
 };
 
@@ -263,12 +305,15 @@ const generateRecurringTransactions = () => {
   if (selectedRecurringTransactions.value) {
     const selected = selectedRecurringTransactions.value;
     transaction.value.activity_one.nature = selected.activity_one.nature;
-    transaction.value.activity_one.account_id = selected.activity_one.account_id;
+    transaction.value.activity_one.account_id =
+      selected.activity_one.account_id;
     transaction.value.activity_two.nature = selected.activity_two.nature;
-    transaction.value.activity_two.account_id = selected.activity_two.account_id;
+    transaction.value.activity_two.account_id =
+      selected.activity_two.account_id;
     transaction.value.category_id = selected.category_id;
-    
-    if (selected.description_id) transaction.value.description_id = selected.description_id;
+
+    if (selected.description_id)
+      transaction.value.description_id = selected.description_id;
     if (selected.origin_id) transaction.value.origin_id = selected.origin_id;
     if (selected.destiny_id) transaction.value.destiny_id = selected.destiny_id;
     if (selected.kind_id) transaction.value.kind_id = selected.kind_id;
@@ -321,7 +366,11 @@ const getOrigins = async () => {
 };
 
 const saveTransaction = async () => {
-  if (transaction.value.origin_id === transaction.value.destiny_id && forShow.value.origin && forShow.value.destiny) {
+  if (
+    transaction.value.origin_id === transaction.value.destiny_id &&
+    forShow.value.origin &&
+    forShow.value.destiny
+  ) {
     Swal.fire({
       icon: "error",
       title: "Validation Error",
@@ -332,7 +381,9 @@ const saveTransaction = async () => {
   }
 
   try {
-    const response = await transactionService.postTransaction(transaction.value);
+    const response = await transactionService.postTransaction(
+      transaction.value,
+    );
     Swal.fire({
       icon: "success",
       title: "Transaction saved",
@@ -458,7 +509,9 @@ onMounted(() => {
   color: #475569;
 }
 
-.form-input, .form-select, .form-textarea-aligned {
+.form-input,
+.form-select,
+.form-textarea-aligned {
   padding: 0.75rem 1rem;
   border: 1px solid var(--light-border);
   border-radius: 10px;
@@ -469,7 +522,9 @@ onMounted(() => {
   box-sizing: border-box; /* Crucial for alignment */
 }
 
-.form-input:focus, .form-select:focus, .form-textarea-aligned:focus {
+.form-input:focus,
+.form-select:focus,
+.form-textarea-aligned:focus {
   outline: none;
   border-color: var(--dark-color-opposite-two);
   box-shadow: 0 0 0 3px rgba(138, 98, 86, 0.1);
@@ -540,7 +595,7 @@ onMounted(() => {
 }
 
 .nature-width {
-  width: 130px;
+  width: 80px;
   flex-shrink: 0;
 }
 
@@ -590,7 +645,8 @@ onMounted(() => {
 }
 
 @media (max-width: 1200px) {
-  .main-form-grid, .secondary-form-grid {
+  .main-form-grid,
+  .secondary-form-grid {
     grid-template-columns: repeat(2, 1fr);
   }
   .notes-area {
@@ -599,7 +655,9 @@ onMounted(() => {
 }
 
 @media (max-width: 768px) {
-  .main-form-grid, .secondary-form-grid, .accounts-grid-layout {
+  .main-form-grid,
+  .secondary-form-grid,
+  .accounts-grid-layout {
     grid-template-columns: 1fr;
   }
   .notes-area {
