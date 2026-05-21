@@ -2,11 +2,14 @@
   <div class="dashboard-view">
     <div class="view-header">
       <h1 class="view-title">Financial Dashboard</h1>
-      <p class="view-subtitle">Overview of your expenses and cost categories.</p>
+      <p class="view-subtitle">Comprehensive overview of your income and expenses.</p>
     </div>
 
     <div class="dashboard-content">
-      <CategoryExpensesChart />
+      <div class="charts-grid">
+        <CategoryIncomeChart />
+        <CategoryExpensesChart />
+      </div>
     </div>
   </div>
 </template>
@@ -15,6 +18,7 @@
 import { onMounted } from 'vue';
 import { useDashboardStore } from '@/stores/dashboardStore';
 import CategoryExpensesChart from '@/components/CategoryExpensesChart.vue';
+import CategoryIncomeChart from '@/components/CategoryIncomeChart.vue';
 
 const store = useDashboardStore();
 
@@ -26,7 +30,7 @@ onMounted(() => {
 <style scoped>
 .dashboard-view {
   padding: 2rem;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
 }
 
@@ -51,6 +55,19 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 2rem;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 1100px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 640px) {

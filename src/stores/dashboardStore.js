@@ -52,28 +52,26 @@ export const useDashboardStore = defineStore("dashboard", () => {
     loading.value = false;
   };
 
-  // Grouping logic
-  const groupByCategory = (transactions) => {
+  /**
+   * General grouping logic
+   * @param {Array} transactions
+   * @param {Array} prefixes Account prefixes to match (e.g. ['5', '6'] for expenses)
+   * @param {String} nature Nature to filter ('1' for Debit, '0' for Credit)
+   */
+  const groupByCategory = (transactions, prefixes, nature) => {
     const groups = {};
 
     transactions.forEach((tx) => {
-      // Find the activity that represents the expense/cost (usually DB in 5xx or 6xx)
-      // or simply iterate through activities and find account_id starting with 5 or 6.
       tx.activities.forEach((activity) => {
         const accountId = String(activity.account_id);
-        if (
-          (accountId.startsWith("5") ||
-            accountId.startsWith("6") ||
-            accountId.startsWith("7")) &&
-          activity.nature === "1"
-        ) {
+        const matchPrefix = prefixes.some((p) => accountId.startsWith(p));
+
+        if (matchPrefix && activity.nature === nature) {
           const categoryCode =
             accountId.substring(0, 2) + "-" + tx.category.category;
           if (!groups[categoryCode]) {
             groups[categoryCode] = 0;
           }
-          // In double entry, expenses/costs increase on Debit (nature 1)
-          // We sum the value.
           groups[categoryCode] += parseFloat(tx.value);
         }
       });
@@ -87,11 +85,20 @@ export const useDashboardStore = defineStore("dashboard", () => {
       .sort((a, b) => b.value - a.value);
   };
 
-  const currentMonthGroups = computed(() =>
-    groupByCategory(currentMonthTransactions.value),
+  // Expenses: prefixes 5, 6, 7 and nature 1 (Debit)
+  const currentMonthExpesesGroups = computed(() =>
+    groupByCategory(currentMonthTransactions.value, ["5", "6", "7"], "1"),
   );
-  const previousMonthGroups = computed(() =>
-    groupByCategory(previousMonthTransactions.value),
+  const previousMonthExpesesGroups = computed(() =>
+    groupByCategory(previousMonthTransactions.value, ["5", "6", "7"], "1"),
+  );
+
+  // Income: prefix 4 and nature 0 (Credit)
+  const currentMonthIncomeGroups = computed(() =>
+    groupByCategory(currentMonthTransactions.value, ["4"], "0"),
+  );
+  const previousMonthIncomeGroups = computed(() =>
+    groupByCategory(previousMonthTransactions.value, ["4"], "0"),
   );
 
   return {
@@ -99,8 +106,10 @@ export const useDashboardStore = defineStore("dashboard", () => {
     previousMonthTransactions,
     loading,
     error,
-    currentMonthGroups,
-    previousMonthGroups,
+    currentMonthExpesesGroups,
+    previousMonthExpesesGroups,
+    currentMonthIncomeGroups,
+    previousMonthIncomeGroups,
     fetchAllDashboardData,
   };
 });

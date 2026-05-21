@@ -2,23 +2,19 @@
   <div class="chart-container">
     <div class="chart-header">
       <div class="header-main">
-        <h2 class="chart-title">Expenses Comparison by Category</h2>
+        <h2 class="chart-title">Income Comparison by Category</h2>
         <div class="header-totals">
           <div class="header-total-item current">
             <span class="total-label">Total Current</span>
-            <span class="total-amount">{{
-              formatCurrency(grandTotalCurrent)
-            }}</span>
+            <span class="total-amount income-text">{{ formatCurrency(grandTotalCurrent) }}</span>
           </div>
           <div class="header-total-item previous">
             <span class="total-label">Total Previous</span>
-            <span class="total-amount">{{
-              formatCurrency(grandTotalPrevious)
-            }}</span>
+            <span class="total-amount">{{ formatCurrency(grandTotalPrevious) }}</span>
           </div>
         </div>
       </div>
-
+      
       <div class="chart-controls">
         <div class="legend-item">
           <span class="color-box current"></span>
@@ -42,24 +38,19 @@
 
     <div v-else class="scrollable-content">
       <div class="bars-wrapper">
-        <div
-          v-for="item in processedData"
-          :key="item.code"
-          class="category-row"
-        >
+        <div v-for="item in processedData" :key="item.code" class="category-row">
           <div class="category-info">
             <span class="category-code">{{ item.code }}</span>
             <span class="category-change" :class="getChangeClass(item.change)">
-              {{ item.change > 0 ? "↑" : item.change < 0 ? "↓" : "" }}
-              {{ Math.abs(item.change).toFixed(1) }}%
+              {{ item.change > 0 ? '↑' : item.change < 0 ? '↓' : '' }} {{ Math.abs(item.change).toFixed(1) }}%
             </span>
           </div>
-
+          
           <div class="bar-group">
             <!-- Current Month Bar -->
             <div class="bar-container">
-              <div
-                class="bar current"
+              <div 
+                class="bar current" 
                 :style="{ width: item.currentWidth + '%' }"
                 :title="`Current: ${formatCurrency(item.currentValue)} (${item.currentShare.toFixed(1)}%)`"
               >
@@ -68,11 +59,11 @@
                 </span>
               </div>
             </div>
-
+            
             <!-- Previous Month Bar -->
             <div class="bar-container">
-              <div
-                class="bar previous"
+              <div 
+                class="bar previous" 
                 :style="{ width: item.previousWidth + '%' }"
                 :title="`Previous: ${formatCurrency(item.previousValue)} (${item.previousShare.toFixed(1)}%)`"
               >
@@ -86,15 +77,11 @@
           <div class="category-shares">
             <div class="share-item current">
               <span class="share-label">Share Cur.</span>
-              <span class="share-value"
-                >{{ item.currentShare.toFixed(1) }}%</span
-              >
+              <span class="share-value income-text">{{ item.currentShare.toFixed(1) }}%</span>
             </div>
             <div class="share-item previous">
               <span class="share-label">Share Prev.</span>
-              <span class="share-value"
-                >{{ item.previousShare.toFixed(1) }}%</span
-              >
+              <span class="share-value">{{ item.previousShare.toFixed(1) }}%</span>
             </div>
           </div>
         </div>
@@ -104,9 +91,9 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
-import { useDashboardStore } from "@/stores/dashboardStore";
-import { formatters } from "@/plugins/formatters";
+import { computed } from 'vue';
+import { useDashboardStore } from '@/stores/dashboardStore';
+import { formatters } from '@/plugins/formatters';
 
 const store = useDashboardStore();
 const loading = computed(() => store.loading);
@@ -114,64 +101,60 @@ const error = computed(() => store.error);
 
 const formatCurrency = (value) => formatters.formatterGeneralNumber(value);
 
-const grandTotalCurrent = computed(() =>
-  store.currentMonthExpesesGroups.reduce((acc, g) => acc + g.value, 0),
+const grandTotalCurrent = computed(() => 
+  store.currentMonthIncomeGroups.reduce((acc, g) => acc + g.value, 0)
 );
 
-const grandTotalPrevious = computed(() =>
-  store.previousMonthExpesesGroups.reduce((acc, g) => acc + g.value, 0),
+const grandTotalPrevious = computed(() => 
+  store.previousMonthIncomeGroups.reduce((acc, g) => acc + g.value, 0)
 );
 
 const processedData = computed(() => {
-  const currentGroups = store.currentMonthExpesesGroups;
-  const previousGroups = store.previousMonthExpesesGroups;
-
+  const currentGroups = store.currentMonthIncomeGroups;
+  const previousGroups = store.previousMonthIncomeGroups;
+  
   const totalC = grandTotalCurrent.value || 1;
   const totalP = grandTotalPrevious.value || 1;
-
-  const allCodes = Array.from(
-    new Set([
-      ...currentGroups.map((g) => g.code),
-      ...previousGroups.map((g) => g.code),
-    ]),
-  ).sort();
+  
+  const allCodes = Array.from(new Set([
+    ...currentGroups.map(g => g.code),
+    ...previousGroups.map(g => g.code)
+  ])).sort();
 
   const maxValue = Math.max(
-    ...currentGroups.map((g) => g.value),
-    ...previousGroups.map((g) => g.value),
-    1,
+    ...currentGroups.map(g => g.value),
+    ...previousGroups.map(g => g.value),
+    1
   );
 
-  return allCodes
-    .map((code) => {
-      const current = currentGroups.find((g) => g.code === code)?.value || 0;
-      const previous = previousGroups.find((g) => g.code === code)?.value || 0;
+  return allCodes.map(code => {
+    const current = currentGroups.find(g => g.code === code)?.value || 0;
+    const previous = previousGroups.find(g => g.code === code)?.value || 0;
+    
+    let change = 0;
+    if (previous > 0) {
+      change = ((current - previous) / previous) * 100;
+    } else if (current > 0) {
+      change = 100;
+    }
 
-      let change = 0;
-      if (previous > 0) {
-        change = ((current - previous) / previous) * 100;
-      } else if (current > 0) {
-        change = 100;
-      }
-
-      return {
-        code,
-        currentValue: current,
-        previousValue: previous,
-        currentWidth: (current / maxValue) * 100,
-        previousWidth: (previous / maxValue) * 100,
-        currentShare: (current / totalC) * 100,
-        previousShare: (previous / totalP) * 100,
-        change,
-      };
-    })
-    .sort((a, b) => b.currentValue - a.currentValue);
+    return {
+      code,
+      currentValue: current,
+      previousValue: previous,
+      currentWidth: (current / maxValue) * 100,
+      previousWidth: (previous / maxValue) * 100,
+      currentShare: (current / totalC) * 100,
+      previousShare: (previous / totalP) * 100,
+      change
+    };
+  }).sort((a, b) => b.currentValue - a.currentValue);
 });
 
 const getChangeClass = (change) => {
-  if (change > 0) return "text-danger";
-  if (change < 0) return "text-success";
-  return "text-neutral";
+  if (change > 0) return 'text-success'; // More income is good
+  if (change < 0) return 'text-danger'; // Less income is bad
+  return 'text-neutral';
 };
 </script>
 
@@ -232,12 +215,9 @@ const getChangeClass = (change) => {
   font-weight: 800;
 }
 
-.header-total-item.current .total-amount {
-  color: #4f46e5;
-}
-.header-total-item.previous .total-amount {
-  color: #64748b;
-}
+.income-text { color: #10b981 !important; }
+
+.header-total-item.previous .total-amount { color: #64748b; }
 
 .chart-controls {
   display: flex;
@@ -257,12 +237,8 @@ const getChangeClass = (change) => {
   border-radius: 2px;
 }
 
-.color-box.current {
-  background-color: #4f46e5;
-}
-.color-box.previous {
-  background-color: #cbd5e1;
-}
+.color-box.current { background-color: #10b981; }
+.color-box.previous { background-color: #cbd5e1; }
 
 .period-label {
   font-size: 0.7rem;
@@ -343,7 +319,7 @@ const getChangeClass = (change) => {
 }
 
 .bar.current {
-  background: linear-gradient(90deg, #4f46e5, #6366f1);
+  background: linear-gradient(90deg, #10b981, #34d399);
 }
 
 .bar.previous {
@@ -386,25 +362,13 @@ const getChangeClass = (change) => {
   color: #1e293b;
 }
 
-.share-item.current .share-value {
-  color: #4f46e5;
-}
-.share-item.previous .share-value {
-  color: #64748b;
-}
+.share-item.previous .share-value { color: #64748b; }
 
-.text-danger {
-  color: #ef4444;
-}
-.text-success {
-  color: #10b981;
-}
-.text-neutral {
-  color: #94a3b8;
-}
+.text-danger { color: #ef4444; }
+.text-success { color: #10b981; }
+.text-neutral { color: #94a3b8; }
 
-.loading-state,
-.error-state {
+.loading-state, .error-state {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -417,19 +381,15 @@ const getChangeClass = (change) => {
   width: 32px;
   height: 32px;
   border: 3px solid #f3f3f3;
-  border-top: 3px solid #4f46e5;
+  border-top: 3px solid #10b981;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 1rem;
 }
 
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 @media (max-width: 768px) {
