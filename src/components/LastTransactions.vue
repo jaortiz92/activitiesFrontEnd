@@ -33,12 +33,14 @@
             <td>{{ transaction.origin.origin }}</td>
             <td>{{ transaction.destiny.origin }}</td>
             <td class="accounts-col">
-              <span class="account-tag db">{{
-                formatActivity(transaction.activities_db)
-              }}</span>
-              <span class="account-tag cr">{{
-                formatActivity(transaction.activities_cr)
-              }}</span>
+              <div class="accounts-wrapper">
+                <span class="account-tag db">{{
+                  formatActivity(transaction.activities_db)
+                }}</span>
+                <span class="account-tag cr">{{
+                  formatActivity(transaction.activities_cr)
+                }}</span>
+              </div>
             </td>
             <td class="value-col">{{ formatCurrency(transaction.value) }}</td>
             <td class="detail-col">{{ transaction.detail }}</td>
@@ -184,7 +186,7 @@ onMounted(() => {
   color: var(--dark-color-opposite-one);
 }
 
-.accounts-col {
+.accounts-wrapper {
   display: flex;
   gap: 0.5rem;
 }
