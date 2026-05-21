@@ -15,6 +15,9 @@
         <router-link class="nav-link" to="/transaction">
           <span class="link-text">Transaction</span>
         </router-link>
+        <router-link class="nav-link" to="/dashboard">
+          <span class="link-text">Dashboard</span>
+        </router-link>
         <router-link class="nav-link" to="/edit">
           <span class="link-text">Edit</span>
         </router-link>

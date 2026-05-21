@@ -2,12 +2,18 @@ import { createRouter, createWebHashHistory } from "vue-router";
 import Home from "../views/Home.vue";
 import Transaction from "../views/Transaction.vue";
 import Edit from "../views/Edit.vue";
+import DashboardView from "../views/DashboardView.vue";
 
 const routes = [
   {
     path: "/",
     name: "Home",
     component: Home,
+  },
+  {
+    path: "/dashboard",
+    name: "Dashboard",
+    component: DashboardView,
   },
   {
     path: "/transaction",
