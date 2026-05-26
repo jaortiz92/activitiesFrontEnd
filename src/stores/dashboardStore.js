@@ -8,17 +8,37 @@ export const useDashboardStore = defineStore("dashboard", () => {
   const loading = ref(false);
   const error = ref(null);
 
-  // Helper to get date range for a month
+  // Base date for calculations (defaults to current date)
+  const baseDate = ref(new Date());
+
+  // Robust date formatter (YYYY-MM-DD)
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  // Helper to get date range for a month relative to baseDate
   const getMonthRange = (monthsAgo = 0) => {
-    const now = new Date();
-    const date = new Date(now.getFullYear(), now.getMonth() - monthsAgo, 1);
+    const date = new Date(
+      baseDate.value.getFullYear(),
+      baseDate.value.getMonth() - monthsAgo,
+      1,
+    );
     const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
     const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
 
     return {
-      start: firstDay.toISOString().split("T")[0],
-      end: lastDay.toISOString().split("T")[0],
+      start: formatDate(firstDay),
+      end: formatDate(lastDay),
     };
+  };
+
+  const setBaseDate = (dateString) => {
+    const [year, month] = dateString.split("-").map(Number);
+    // Use 12:00 to avoid issues with date shifting when just setting the date
+    baseDate.value = new Date(year, month - 1, 1, 12, 0, 0);
   };
 
   const fetchCurrentMonthData = async () => {
@@ -52,16 +72,14 @@ export const useDashboardStore = defineStore("dashboard", () => {
     loading.value = false;
   };
 
-  /**
-   * General grouping logic
-   * @param {Array} transactions
-   * @param {Array} prefixes Account prefixes to match (e.g. ['5', '6'] for expenses)
-   * @param {String} nature Nature to filter ('1' for Debit, '0' for Credit)
-   */
   const groupByCategory = (transactions, prefixes, nature) => {
     const groups = {};
 
     transactions.forEach((tx) => {
+      // Use a Set to ensure we only count one activity per transaction for the same category
+      // This prevents doubling values if a transaction has multiple lines for the same category
+      const matchedCategories = new Set();
+
       tx.activities.forEach((activity) => {
         const accountId = String(activity.account_id);
         const matchPrefix = prefixes.some((p) => accountId.startsWith(p));
@@ -69,10 +87,14 @@ export const useDashboardStore = defineStore("dashboard", () => {
         if (matchPrefix && activity.nature === nature) {
           const categoryCode =
             accountId.substring(0, 2) + "-" + tx.category.category;
-          if (!groups[categoryCode]) {
-            groups[categoryCode] = 0;
+          
+          if (!matchedCategories.has(categoryCode)) {
+            if (!groups[categoryCode]) {
+              groups[categoryCode] = 0;
+            }
+            groups[categoryCode] += parseFloat(tx.value);
+            matchedCategories.add(categoryCode);
           }
-          groups[categoryCode] += parseFloat(tx.value);
         }
       });
     });
@@ -85,6 +107,53 @@ export const useDashboardStore = defineStore("dashboard", () => {
       .sort((a, b) => b.value - a.value);
   };
 
+  const calculateDailyEvolution = (transactions, year, month) => {
+    const lastDay = new Date(year, month, 0).getDate();
+    const dailyValues = Array.from({ length: lastDay }, (_, i) => ({
+      day: i + 1,
+      netProfit: 0,
+      cumulative: 0,
+    }));
+
+    transactions.forEach((tx) => {
+      // Extract day directly from the string to avoid timezone shifts
+      const dateParts = tx.transaction_date.split("-");
+      const day = parseInt(dateParts[2], 10);
+
+      if (day >= 1 && day <= lastDay) {
+        let dailyNet = 0;
+        // Again, be careful not to overcount if multiple activities match
+        // For net profit, we check if there's ANY income or ANY expense activity
+        let hasIncome = false;
+        let hasExpense = false;
+
+        tx.activities.forEach((activity) => {
+          const accountId = String(activity.account_id);
+          if (accountId.startsWith("4") && activity.nature === "0") {
+            hasIncome = true;
+          }
+          if (
+            ["5", "6", "7"].some((p) => accountId.startsWith(p)) &&
+            activity.nature === "1"
+          ) {
+            hasExpense = true;
+          }
+        });
+
+        if (hasIncome) dailyNet += parseFloat(tx.value);
+        if (hasExpense) dailyNet -= parseFloat(tx.value);
+        
+        dailyValues[day - 1].netProfit += dailyNet;
+      }
+    });
+
+    let runningTotal = 0;
+    return dailyValues.map((d) => {
+      runningTotal += d.netProfit;
+      return { ...d, cumulative: runningTotal };
+    });
+  };
+
   // Expenses: prefixes 5, 6, 7 and nature 1 (Debit)
   const currentMonthExpesesGroups = computed(() =>
     groupByCategory(currentMonthTransactions.value, ["5", "6", "7"], "1"),
@@ -93,7 +162,6 @@ export const useDashboardStore = defineStore("dashboard", () => {
     groupByCategory(previousMonthTransactions.value, ["5", "6", "7"], "1"),
   );
 
-  // Income: prefix 4 and nature 0 (Credit)
   const currentMonthIncomeGroups = computed(() =>
     groupByCategory(currentMonthTransactions.value, ["4"], "0"),
   );
@@ -101,15 +169,40 @@ export const useDashboardStore = defineStore("dashboard", () => {
     groupByCategory(previousMonthTransactions.value, ["4"], "0"),
   );
 
+  const currentMonthDailyEvolution = computed(() => {
+    return calculateDailyEvolution(
+      currentMonthTransactions.value,
+      baseDate.value.getFullYear(),
+      baseDate.value.getMonth() + 1,
+    );
+  });
+
+  const previousMonthDailyEvolution = computed(() => {
+    const prevDate = new Date(
+      baseDate.value.getFullYear(),
+      baseDate.value.getMonth() - 1,
+      1,
+    );
+    return calculateDailyEvolution(
+      previousMonthTransactions.value,
+      prevDate.getFullYear(),
+      prevDate.getMonth() + 1,
+    );
+  });
+
   return {
     currentMonthTransactions,
     previousMonthTransactions,
     loading,
     error,
+    baseDate,
     currentMonthExpesesGroups,
     previousMonthExpesesGroups,
     currentMonthIncomeGroups,
     previousMonthIncomeGroups,
+    currentMonthDailyEvolution,
+    previousMonthDailyEvolution,
     fetchAllDashboardData,
+    setBaseDate,
   };
 });
