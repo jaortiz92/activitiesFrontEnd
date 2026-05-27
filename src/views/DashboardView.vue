@@ -21,8 +21,11 @@
     </div>
 
     <div class="dashboard-content">
-      <!-- High-level evolution chart -->
-      <NetProfitEvolutionChart />
+      <!-- High-level evolution charts -->
+      <div class="evolution-grid">
+        <NetProfitEvolutionChart />
+        <CashFlowEvolutionChart />
+      </div>
 
       <div class="charts-grid">
         <CategoryIncomeChart />
@@ -38,6 +41,7 @@ import { useDashboardStore } from '@/stores/dashboardStore';
 import CategoryExpensesChart from '@/components/CategoryExpensesChart.vue';
 import CategoryIncomeChart from '@/components/CategoryIncomeChart.vue';
 import NetProfitEvolutionChart from '@/components/NetProfitEvolutionChart.vue';
+import CashFlowEvolutionChart from '@/components/CashFlowEvolutionChart.vue';
 
 const store = useDashboardStore();
 
@@ -127,15 +131,22 @@ onMounted(() => {
   gap: 2rem;
 }
 
-.charts-grid {
+.evolution-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
   gap: 2rem;
   align-items: start;
 }
 
-@media (max-width: 1100px) {
-  .charts-grid {
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 1200px) {
+  .charts-grid, .evolution-grid {
     grid-template-columns: 1fr;
   }
 }

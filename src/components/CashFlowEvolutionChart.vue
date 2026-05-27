@@ -2,18 +2,18 @@
   <div class="chart-container">
     <div class="chart-header">
       <div class="header-main">
-        <h2 class="chart-title">Net Profit Evolution (Daily)</h2>
+        <h2 class="chart-title">Cash Flow Evolution (Daily)</h2>
         <div class="header-totals">
           <div class="header-total-item current">
-            <span class="total-label">Current Net</span>
-            <span class="total-amount" :class="getNetClass(currentFinalNet)">
-              {{ formatCurrency(currentFinalNet) }}
+            <span class="total-label">Current Cash</span>
+            <span class="total-amount" :class="getNetClass(currentFinalCash)">
+              {{ formatCurrency(currentFinalCash) }}
             </span>
           </div>
           <div class="header-total-item previous">
-            <span class="total-label">Previous Net</span>
+            <span class="total-label">Previous Cash</span>
             <span class="total-amount">
-              {{ formatCurrency(previousFinalNet) }}
+              {{ formatCurrency(previousFinalCash) }}
             </span>
           </div>
         </div>
@@ -33,7 +33,7 @@
 
     <div v-if="loading" class="loading-state">
       <div class="spinner"></div>
-      <p>Loading evolution data...</p>
+      <p>Loading cash flow data...</p>
     </div>
 
     <div v-else-if="error" class="error-state">
@@ -63,14 +63,14 @@
 
         <!-- Current Month Line -->
         <path :d="currentPath" 
-          fill="none" stroke="#4f46e5" stroke-width="4" 
+          fill="none" stroke="#10b981" stroke-width="4" 
           stroke-linecap="round" stroke-linejoin="round" />
         
         <!-- Hover Marker -->
         <g v-if="hoverDay">
           <line :x1="getX(hoverDay)" y1="0" :x2="getX(hoverDay)" y2="400" 
-            stroke="#4f46e5" stroke-width="1.5" stroke-dasharray="3,3" />
-          <circle :cx="getX(hoverDay)" :cy="currentY" r="6" fill="#4f46e5" stroke="white" stroke-width="2" />
+            stroke="#10b981" stroke-width="1.5" stroke-dasharray="3,3" />
+          <circle :cx="getX(hoverDay)" :cy="currentY" r="6" fill="#10b981" stroke="white" stroke-width="2" />
           <circle :cx="getX(hoverDay)" :cy="previousY" r="5" fill="#cbd5e1" stroke="white" stroke-width="2" />
         </g>
 
@@ -122,18 +122,18 @@ const hoverDay = ref(null);
 const mouseX = ref(0);
 const containerWidth = ref(1000);
 
-const currentEvolution = computed(() => store.currentMonthDailyEvolution);
-const previousEvolution = computed(() => store.previousMonthDailyEvolution);
+const currentEvolution = computed(() => store.currentMonthCashFlowEvolution);
+const previousEvolution = computed(() => store.previousMonthCashFlowEvolution);
 
 // Max days shown on axis is based on the current month's length
 const daysInMonth = computed(() => currentEvolution.value.length || 31);
 
-const currentFinalNet = computed(() => {
+const currentFinalCash = computed(() => {
   if (!currentEvolution.value.length) return 0;
   return currentEvolution.value[currentEvolution.value.length - 1].cumulative;
 });
 
-const previousFinalNet = computed(() => {
+const previousFinalCash = computed(() => {
   if (!previousEvolution.value.length) return 0;
   return previousEvolution.value[previousEvolution.value.length - 1].cumulative;
 });
@@ -148,7 +148,6 @@ const minY = computed(() => Math.min(...allValues.value));
 const maxY = computed(() => Math.max(...allValues.value));
 const rangeY = computed(() => Math.max(maxY.value - minY.value, 1));
 
-// Updated getX to be dynamic based on current month's days
 const getX = (day) => {
   if (daysInMonth.value <= 1) return 0;
   return ((day - 1) / (daysInMonth.value - 1)) * 1000;
@@ -188,7 +187,6 @@ const handleMouseMove = (event) => {
   const x = event.clientX - rect.left;
   mouseX.value = x;
   
-  // Calculate day based on dynamic month length
   const day = Math.round((x / rect.width) * (daysInMonth.value - 1)) + 1;
   hoverDay.value = Math.max(1, Math.min(day, daysInMonth.value));
 };
@@ -213,7 +211,6 @@ const hoverData = computed(() => {
 });
 
 const tooltipStyle = computed(() => {
-  // Logic to prevent tooltip from going off-screen using actual pixel width
   const isRightSide = mouseX.value > containerWidth.value / 2;
   return {
     left: isRightSide ? 'auto' : `${mouseX.value + 20}px`,
@@ -303,7 +300,7 @@ const getNetClass = (value) => {
   border-radius: 2px;
 }
 
-.line-sample.current { background-color: #4f46e5; }
+.line-sample.current { background-color: #10b981; }
 .line-sample.previous { background-color: #cbd5e1; }
 
 .period-label {
@@ -316,7 +313,7 @@ const getNetClass = (value) => {
   position: relative;
   width: 100%;
   height: 400px;
-  padding-bottom: 40px; /* Space for x-axis labels */
+  padding-bottom: 40px;
 }
 
 .evolution-svg {
@@ -392,7 +389,7 @@ const getNetClass = (value) => {
   border-radius: 50%;
 }
 
-.dot.current { background-color: #4f46e5; }
+.dot.current { background-color: #10b981; }
 .dot.previous { background-color: #cbd5e1; }
 
 .text-danger { color: #ef4444; }
@@ -411,7 +408,7 @@ const getNetClass = (value) => {
   width: 40px;
   height: 40px;
   border: 4px solid #f3f3f3;
-  border-top: 4px solid #4f46e5;
+  border-top: 4px solid #10b981;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 1rem;

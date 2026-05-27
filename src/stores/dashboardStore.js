@@ -87,7 +87,7 @@ export const useDashboardStore = defineStore("dashboard", () => {
         if (matchPrefix && activity.nature === nature) {
           const categoryCode =
             accountId.substring(0, 2) + "-" + tx.category.category;
-          
+
           if (!matchedCategories.has(categoryCode)) {
             if (!groups[categoryCode]) {
               groups[categoryCode] = 0;
@@ -142,7 +142,7 @@ export const useDashboardStore = defineStore("dashboard", () => {
 
         if (hasIncome) dailyNet += parseFloat(tx.value);
         if (hasExpense) dailyNet -= parseFloat(tx.value);
-        
+
         dailyValues[day - 1].netProfit += dailyNet;
       }
     });
@@ -150,6 +150,52 @@ export const useDashboardStore = defineStore("dashboard", () => {
     let runningTotal = 0;
     return dailyValues.map((d) => {
       runningTotal += d.netProfit;
+      return { ...d, cumulative: runningTotal };
+    });
+  };
+
+  const calculateCashFlowEvolution = (transactions, year, month) => {
+    const lastDay = new Date(year, month, 0).getDate();
+    const dailyValues = Array.from({ length: lastDay }, (_, i) => ({
+      day: i + 1,
+      cashFlow: 0,
+      cumulative: 0,
+    }));
+
+    transactions.forEach((tx) => {
+      const dateParts = tx.transaction_date.split("-");
+      const day = parseInt(dateParts[2], 10);
+
+      if (day >= 1 && day <= lastDay) {
+        // Filter by origin/destiny names as requested
+        const matchesOrigin = [
+          "Efectivo",
+          "Tarjeta Debito",
+          "Tarjeta Credito",
+        ].includes(tx.origin?.origin);
+        const matchesDestiny = [
+          "Efectivo",
+          "Tarjeta Debito",
+          "Tarjeta Credito",
+        ].includes(tx.destiny?.origin);
+
+        if (matchesOrigin || matchesDestiny) {
+          let dailyNet = 0;
+          const value = parseFloat(tx.value);
+          if (matchesDestiny) {
+            dailyNet += value;
+          }
+          if (matchesOrigin) {
+            dailyNet -= value;
+          }
+          dailyValues[day - 1].cashFlow += dailyNet;
+        }
+      }
+    });
+
+    let runningTotal = 0;
+    return dailyValues.map((d) => {
+      runningTotal += d.cashFlow;
       return { ...d, cumulative: runningTotal };
     });
   };
@@ -190,6 +236,27 @@ export const useDashboardStore = defineStore("dashboard", () => {
     );
   });
 
+  const currentMonthCashFlowEvolution = computed(() => {
+    return calculateCashFlowEvolution(
+      currentMonthTransactions.value,
+      baseDate.value.getFullYear(),
+      baseDate.value.getMonth() + 1,
+    );
+  });
+
+  const previousMonthCashFlowEvolution = computed(() => {
+    const prevDate = new Date(
+      baseDate.value.getFullYear(),
+      baseDate.value.getMonth() - 1,
+      1,
+    );
+    return calculateCashFlowEvolution(
+      previousMonthTransactions.value,
+      prevDate.getFullYear(),
+      prevDate.getMonth() + 1,
+    );
+  });
+
   return {
     currentMonthTransactions,
     previousMonthTransactions,
@@ -202,6 +269,8 @@ export const useDashboardStore = defineStore("dashboard", () => {
     previousMonthIncomeGroups,
     currentMonthDailyEvolution,
     previousMonthDailyEvolution,
+    currentMonthCashFlowEvolution,
+    previousMonthCashFlowEvolution,
     fetchAllDashboardData,
     setBaseDate,
   };
