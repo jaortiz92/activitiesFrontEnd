@@ -107,6 +107,70 @@ export const useDashboardStore = defineStore("dashboard", () => {
       .sort((a, b) => b.value - a.value);
   };
 
+  const groupByAccount = (transactions) => {
+    const groups = {};
+
+    transactions.forEach((tx) => {
+      tx.activities.forEach((activity) => {
+        const accountId = String(activity.account_id);
+        if (!groups[accountId]) {
+          groups[accountId] = 0;
+        }
+
+        const value = parseFloat(tx.value);
+        // Net movement: Debit (+) Credit (-)
+        if (activity.nature === "0") {
+          groups[accountId] -= value;
+        } else {
+          groups[accountId] += value;
+        }
+      });
+    });
+
+    for (const accountId in groups) {
+      if (
+        accountId.startsWith("2") ||
+        accountId.startsWith("3") ||
+        accountId.startsWith("4")
+      ) {
+        groups[accountId] = -groups[accountId];
+      }
+    }
+    return Object.keys(groups)
+      .map((code) => ({
+        code,
+        value: groups[code],
+      }))
+      .sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
+  };
+
+  const calculateFinancialStatus = (transactions) => {
+    let assets = 0;
+    let liabilities = 0;
+    let equity = 0;
+    let netResult = 0;
+
+    transactions.forEach((tx) => {
+      tx.activities.forEach((activity) => {
+        const accountId = String(activity.account_id);
+        const value = parseFloat(tx.value);
+        const isDebit = activity.nature === "1";
+
+        if (accountId.startsWith("1")) {
+          assets += isDebit ? value : -value;
+        } else if (accountId.startsWith("2")) {
+          liabilities += isDebit ? -value : value;
+        } else if (accountId.startsWith("3")) {
+          equity += isDebit ? -value : value;
+        } else if (["4", "5", "6", "7"].some((p) => accountId.startsWith(p))) {
+          netResult += isDebit ? -value : value;
+        }
+      });
+    });
+
+    return { assets, liabilities, equity, netResult };
+  };
+
   const calculateDailyEvolution = (transactions, year, month) => {
     const lastDay = new Date(year, month, 0).getDate();
     const dailyValues = Array.from({ length: lastDay }, (_, i) => ({
@@ -215,6 +279,20 @@ export const useDashboardStore = defineStore("dashboard", () => {
     groupByCategory(previousMonthTransactions.value, ["4"], "0"),
   );
 
+  const currentMonthAccountGroups = computed(() =>
+    groupByAccount(currentMonthTransactions.value),
+  );
+  const previousMonthAccountGroups = computed(() =>
+    groupByAccount(previousMonthTransactions.value),
+  );
+
+  const currentMonthFinancialStatus = computed(() =>
+    calculateFinancialStatus(currentMonthTransactions.value),
+  );
+  const previousMonthFinancialStatus = computed(() =>
+    calculateFinancialStatus(previousMonthTransactions.value),
+  );
+
   const currentMonthDailyEvolution = computed(() => {
     return calculateDailyEvolution(
       currentMonthTransactions.value,
@@ -267,6 +345,10 @@ export const useDashboardStore = defineStore("dashboard", () => {
     previousMonthExpesesGroups,
     currentMonthIncomeGroups,
     previousMonthIncomeGroups,
+    currentMonthAccountGroups,
+    previousMonthAccountGroups,
+    currentMonthFinancialStatus,
+    previousMonthFinancialStatus,
     currentMonthDailyEvolution,
     previousMonthDailyEvolution,
     currentMonthCashFlowEvolution,

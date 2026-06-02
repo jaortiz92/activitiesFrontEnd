@@ -30,6 +30,8 @@
       <div class="charts-grid">
         <CategoryIncomeChart />
         <CategoryExpensesChart />
+        <AccountBalanceChart />
+        <FinancialStatusChart />
       </div>
     </div>
   </div>
@@ -40,6 +42,8 @@ import { onMounted, ref } from 'vue';
 import { useDashboardStore } from '@/stores/dashboardStore';
 import CategoryExpensesChart from '@/components/CategoryExpensesChart.vue';
 import CategoryIncomeChart from '@/components/CategoryIncomeChart.vue';
+import AccountBalanceChart from '@/components/AccountBalanceChart.vue';
+import FinancialStatusChart from '@/components/FinancialStatusChart.vue';
 import NetProfitEvolutionChart from '@/components/NetProfitEvolutionChart.vue';
 import CashFlowEvolutionChart from '@/components/CashFlowEvolutionChart.vue';
 
