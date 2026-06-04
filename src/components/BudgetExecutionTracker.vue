@@ -155,45 +155,45 @@ const getProgressBarClass = (item) => {
 .budget-tracker {
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;
+  gap: 1.5rem;
 }
 
 /* Summary Cards styles */
 .summary-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
 }
 
 .summary-card {
   background-color: white;
-  padding: 1.25rem 1.5rem;
-  border-radius: 14px;
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
   border: 1px solid var(--light-border, #e2e8f0);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.05);
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  gap: 1rem;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .summary-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 12px -4px rgba(0, 0, 0, 0.08);
 }
 
 .card-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .card-icon svg {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
 }
 
 .bg-blue { background-color: rgba(59, 130, 246, 0.1); color: #2563eb; }
@@ -205,19 +205,19 @@ const getProgressBarClass = (item) => {
 .card-info {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.125rem;
 }
 
 .card-label {
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: #64748b;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.025em;
 }
 
 .card-value {
-  font-size: 1.375rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: #1e293b;
 }
@@ -231,7 +231,7 @@ const getProgressBarClass = (item) => {
   background-color: white;
   border-radius: 14px;
   border: 1px dashed #cbd5e1;
-  padding: 4rem 2rem;
+  padding: 3rem 2rem;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -260,25 +260,25 @@ const getProgressBarClass = (item) => {
 /* Budget Cards Grid styles */
 .budget-items-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
 }
 
 .budget-item-card {
   background-color: white;
-  padding: 1.5rem;
-  border-radius: 14px;
+  padding: 1rem;
+  border-radius: 12px;
   border: 1px solid var(--light-border, #e2e8f0);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 0.75rem;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .budget-item-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.08);
   border-color: #cbd5e1;
 }
 
@@ -286,24 +286,28 @@ const getProgressBarClass = (item) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 1rem;
+  gap: 0.5rem;
 }
 
 .item-title {
-  font-size: 1.125rem;
+  font-size: 1rem;
   font-weight: 700;
   color: #1e293b;
   margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Badges */
 .badge {
-  font-size: 0.75rem;
+  font-size: 0.65rem;
   font-weight: 700;
-  padding: 0.25rem 0.625rem;
+  padding: 0.125rem 0.5rem;
   border-radius: 9999px;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.025em;
+  flex-shrink: 0;
 }
 
 .badge-green { background-color: #ecfdf5; color: #065f46; }
@@ -314,24 +318,25 @@ const getProgressBarClass = (item) => {
 .item-metrics {
   display: flex;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 0.75rem;
+  align-items: baseline;
 }
 
 .metric {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.125rem;
 }
 
 .metric-label {
-  font-size: 0.75rem;
+  font-size: 0.65rem;
   font-weight: 600;
   color: #94a3b8;
   text-transform: uppercase;
 }
 
 .metric-value {
-  font-size: 1.125rem;
+  font-size: 1rem;
   font-weight: 700;
   color: #334155;
 }
@@ -346,7 +351,7 @@ const getProgressBarClass = (item) => {
 
 /* Progress bar styles */
 .progress-bar-container {
-  height: 10px;
+  height: 6px;
   background-color: #f1f5f9;
   border-radius: 9999px;
   overflow: hidden;
@@ -368,10 +373,10 @@ const getProgressBarClass = (item) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   color: #64748b;
   border-top: 1px solid #f1f5f9;
-  padding-top: 0.875rem;
+  padding-top: 0.5rem;
   gap: 0.5rem;
   flex-wrap: wrap;
 }

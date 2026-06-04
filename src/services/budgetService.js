@@ -18,9 +18,9 @@ export const budgetService = {
     return response.data;
   },
 
-  async getComparison(month, year) {
+  async getComparison(month, year, mode = "monthly") {
     const response = await axios.get(`${API_URL}/comparison`, {
-      params: { month, year }
+      params: { month, year, mode }
     });
     return response.data;
   }

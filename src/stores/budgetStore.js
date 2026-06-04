@@ -5,6 +5,7 @@ import { budgetService } from '@/services/budgetService';
 export const useBudgetStore = defineStore('budget', () => {
   const currentMonth = ref(new Date().getMonth() + 1);
   const currentYear = ref(new Date().getFullYear());
+  const comparisonMode = ref("monthly");
   const comparisonData = ref([]);
   const loading = ref(false);
   const error = ref(null);
@@ -15,7 +16,8 @@ export const useBudgetStore = defineStore('budget', () => {
     try {
       comparisonData.value = await budgetService.getComparison(
         currentMonth.value,
-        currentYear.value
+        currentYear.value,
+        comparisonMode.value
       );
     } catch (err) {
       error.value = err.message || 'Failed to fetch budget comparison';
@@ -29,13 +31,19 @@ export const useBudgetStore = defineStore('budget', () => {
     currentYear.value = year;
   };
 
+  const setComparisonMode = (mode) => {
+    comparisonMode.value = mode;
+  };
+
   return {
     currentMonth,
     currentYear,
+    comparisonMode,
     comparisonData,
     loading,
     error,
     fetchComparison,
-    setPeriod
+    setPeriod,
+    setComparisonMode
   };
 });

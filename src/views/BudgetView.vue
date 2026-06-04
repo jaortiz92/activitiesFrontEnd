@@ -7,15 +7,32 @@
           <p class="view-subtitle">Compare your planned budget against actual monthly spending.</p>
         </div>
         
-        <div class="month-selector">
-          <label for="base-month" class="selector-label">Analysis Period:</label>
-          <input 
-            type="month" 
-            id="base-month" 
-            v-model="selectedMonth" 
-            @change="handleMonthChange"
-            class="month-input"
-          />
+        <div class="controls-container">
+          <div class="mode-selector">
+            <button 
+              :class="['mode-btn', store.comparisonMode === 'monthly' ? 'active' : '']"
+              @click="toggleMode('monthly')"
+            >
+              Monthly
+            </button>
+            <button 
+              :class="['mode-btn', store.comparisonMode === 'ytd' ? 'active' : '']"
+              @click="toggleMode('ytd')"
+            >
+              YTD
+            </button>
+          </div>
+
+          <div class="month-selector">
+            <label for="base-month" class="selector-label">Analysis Period:</label>
+            <input 
+              type="month" 
+              id="base-month" 
+              v-model="selectedMonth" 
+              @change="handleMonthChange"
+              class="month-input"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -30,7 +47,7 @@
         {{ store.error }}
       </div>
 
-      <BudgetExecutionTracker v-else />
+      <BudgetPerformanceList v-else />
     </div>
   </div>
 </template>
@@ -38,7 +55,7 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import { useBudgetStore } from '@/stores/budgetStore';
-import BudgetExecutionTracker from '@/components/BudgetExecutionTracker.vue';
+import BudgetPerformanceList from '@/components/BudgetPerformanceList.vue';
 
 const store = useBudgetStore();
 
@@ -50,6 +67,11 @@ const selectedMonth = ref(currentMonthStr);
 const handleMonthChange = () => {
   const [year, month] = selectedMonth.value.split('-').map(Number);
   store.setPeriod(month, year);
+  store.fetchComparison();
+};
+
+const toggleMode = (mode) => {
+  store.setComparisonMode(mode);
   store.fetchComparison();
 };
 
@@ -91,6 +113,39 @@ onMounted(() => {
   font-size: 1rem;
   color: #64748b;
   margin: 0;
+}
+
+.controls-container {
+  display: flex;
+  align-items: flex-end;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.mode-selector {
+  display: flex;
+  background-color: #f1f5f9;
+  padding: 4px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+}
+
+.mode-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: transparent;
+  color: #64748b;
+}
+
+.mode-btn.active {
+  background-color: white;
+  color: #1e293b;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .month-selector {
