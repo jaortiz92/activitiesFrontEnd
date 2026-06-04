@@ -3,6 +3,7 @@ import Home from "../views/Home.vue";
 import Transaction from "../views/Transaction.vue";
 import Edit from "../views/Edit.vue";
 import DashboardView from "../views/DashboardView.vue";
+import BudgetView from "../views/BudgetView.vue";
 
 const routes = [
   {
@@ -14,6 +15,11 @@ const routes = [
     path: "/dashboard",
     name: "Dashboard",
     component: DashboardView,
+  },
+  {
+    path: "/budget",
+    name: "Budget",
+    component: BudgetView,
   },
   {
     path: "/transaction",
